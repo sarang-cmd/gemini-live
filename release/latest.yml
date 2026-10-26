@@ -1,0 +1,8 @@
+version: 2.0.0
+files:
+  - url: Halo-Setup-2.0.0.exe
+    sha512: m1QuJ8+w2zeOmWq13f9D+4CTyrUI8E51FyW0FqAtK3ncSNYnEBBbXR39R8LN1cY4gyHQ0UN+e90UFGbMnAqqPw==
+    size: 126389017
+path: Halo-Setup-2.0.0.exe
+sha512: m1QuJ8+w2zeOmWq13f9D+4CTyrUI8E51FyW0FqAtK3ncSNYnEBBbXR39R8LN1cY4gyHQ0UN+e90UFGbMnAqqPw==
+releaseDate: '2026-10-26T12:27:13.283Z'

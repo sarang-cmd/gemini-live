@@ -1,0 +1,12 @@
+version: 2.0.0
+files:
+  - url: Halo-2.0.0.AppImage
+    sha512: 6lrhdLT0cXtFllyS+8nR0UlHFFAsrSCFjYFtihTKbj0VM3OO3aMoRUGJZM6h0pIBfpn1LK5abhbEw0RWDttTWw==
+    size: 134423100
+    blockMapSize: 139856
+  - url: halo_2.0.0_amd64.deb
+    sha512: vYOAjliGdnn26oyiXqFeMY1Eupazf9JkCfXFtP5yvMfKSAKfvTwPyz8wKpYtaBPHlznnPUYaVdaoQBvvqeSNfg==
+    size: 105829504
+path: Halo-2.0.0.AppImage
+sha512: 6lrhdLT0cXtFllyS+8nR0UlHFFAsrSCFjYFtihTKbj0VM3OO3aMoRUGJZM6h0pIBfpn1LK5abhbEw0RWDttTWw==
+releaseDate: '2026-10-26T12:24:05.769Z'
