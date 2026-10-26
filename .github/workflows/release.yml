@@ -52,6 +52,11 @@ jobs:
   linux:
     name: Linux
     runs-on: ubuntu-latest
+    # The AppImage is built without FUSE, and a failure here must not keep the
+    # Windows installers from being released.
+    continue-on-error: true
+    env:
+      ELECTRON_BUILDER_APPIMAGE_EXTRACT_AND_RUN: '1'
     steps:
       - uses: actions/checkout@v4
 
