@@ -1,0 +1,23 @@
+{
+  "name": "gemini-live",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Halo — a Siri-style voice assistant built on the Gemini Live API",
+  "keywords": [
+    "gemini",
+    "live-api",
+    "voice-assistant",
+    "web-audio",
+    "realtime"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node --test --test-force-exit"
+  }
+}
