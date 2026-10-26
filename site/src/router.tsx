@@ -7,9 +7,21 @@ import { useEffect, useState, type AnchorHTMLAttributes, type ReactNode } from '
  * and a link that intercepts ordinary clicks.
  */
 
+/**
+ * The path the site is served from, without the trailing slash.
+ *
+ * A site under a sub path, like the one GitHub Pages serves, keeps that path
+ * in the address bar, so it is taken off before the page is looked up.
+ */
+function basePath(): string {
+  return import.meta.env.BASE_URL.replace(/\/+$/, '');
+}
+
 function currentPath(): string {
+  const base = basePath();
   const path = window.location.pathname.replace(/\/+$/, '');
-  return path || '/';
+  const stripped = base && path.startsWith(base) ? path.slice(base.length) : path;
+  return stripped || '/';
 }
 
 export function useRoute(): string {
@@ -25,8 +37,9 @@ export function useRoute(): string {
 }
 
 export function navigate(to: string): void {
-  if (to === currentPath()) return;
-  window.history.pushState({}, '', to);
+  const target = `${basePath()}${to.startsWith('/') ? to : `/${to}`}`;
+  if (target === window.location.pathname) return;
+  window.history.pushState({}, '', target);
   window.dispatchEvent(new PopStateEvent('popstate'));
   window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
 }
@@ -39,7 +52,7 @@ interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 export function Link({ to, children, onClick, ...rest }: LinkProps) {
   return (
     <a
-      href={to}
+      href={`${basePath()}${to.startsWith('/') ? to : `/${to}`}`}
       onClick={(event) => {
         onClick?.(event);
         if (event.defaultPrevented) return;
