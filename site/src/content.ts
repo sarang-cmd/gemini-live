@@ -107,7 +107,7 @@ export const underTheHood = {
     ],
     [
       'Tests',
-      '75 of them, including a mock Gemini WebSocket server, a mock Groq API and a DOM mount of the orb.',
+      '109 of them, including a mock Gemini WebSocket server, a mock Groq API and a DOM mount of the orb.',
     ],
   ],
 };

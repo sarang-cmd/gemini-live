@@ -2,10 +2,12 @@ name: pages
 
 # Publishes the marketing site to GitHub Pages.
 #
-# The site is the same build that Vercel serves: `npm run site:build`. The
-# Vercel project sits behind the deployment protection of the account, which
-# asks a visitor to sign in, so the Pages site is the address that is open to
-# everyone.
+# The site is the same build that Vercel serves: `npm run site:build`. The Vercel project
+# sits behind the deployment protection of the account, which asks a visitor to sign in, so
+# the Pages site is the address that is open to everyone.
+#
+# Pages for this repository publishes from the `gh-pages` branch. The workflow builds the
+# site, writes it to that branch and asks GitHub to publish it.
 
 on:
   push:
@@ -14,7 +16,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -23,8 +25,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build the site
+  publish:
+    name: Build and publish
     runs-on: ubuntu-latest
     env:
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
@@ -49,25 +51,43 @@ jobs:
         # needs a page to answer with.
         run: cp site/dist/index.html site/dist/404.html
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: site/dist
+      - name: Write the site to the gh-pages branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          publish="$RUNNER_TEMP/pages"
+          rm -rf "$publish"
+          mkdir -p "$publish"
+          cp -r site/dist/. "$publish/"
+          # Jekyll would drop the files it does not recognise, so the branch
+          # is published as it is.
+          touch "$publish/.nojekyll"
+          cd "$publish"
+          git init -q -b gh-pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet || git commit -q -m 'Publish the site'
+          git push --force \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            gh-pages
 
-  deploy:
-    name: Publish
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Make sure the Pages site exists
-        # The site has to be there before the first deployment.
-        continue-on-error: true
+      - name: Ask GitHub to publish the branch
+        # A push that uses the workflow token does not start a Pages build on its
+        # own, so the build is asked for here.
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api --method POST "repos/${{ github.repository }}/pages" -f build_type=workflow
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds"
 
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Check the published page
+        run: |
+          for attempt in $(seq 1 18); do
+            if curl -fsS -o /dev/null 'https://sarang-cmd.github.io/gemini-live/'; then
+              echo 'The site answers.'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'The site did not answer in time.' >&2
+          exit 1
