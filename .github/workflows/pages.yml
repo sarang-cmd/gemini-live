@@ -18,7 +18,6 @@ on:
 permissions:
   contents: write
   pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -51,6 +50,13 @@ jobs:
         # needs a page to answer with.
         run: cp site/dist/index.html site/dist/404.html
 
+      - name: Remember what was built
+        id: build
+        run: |
+          asset=$(grep -o 'assets/index-[A-Za-z0-9_-]*\.js' site/dist/index.html | head -1)
+          echo "asset=$asset" >> "$GITHUB_OUTPUT"
+          echo "The build is $asset"
+
       - name: Write the site to the gh-pages branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -75,19 +81,23 @@ jobs:
 
       - name: Ask GitHub to publish the branch
         # A push that uses the workflow token does not start a Pages build on its
-        # own, so the build is asked for here.
+        # own, so the build is asked for here. GitHub keeps a record of the push
+        # as well, and that record fails; the build requested here is the one that
+        # publishes the branch.
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds"
 
-      - name: Check the published page
+      - name: Check that the site serves this build
+        env:
+          ASSET: ${{ steps.build.outputs.asset }}
         run: |
-          for attempt in $(seq 1 18); do
-            if curl -fsS -o /dev/null 'https://sarang-cmd.github.io/gemini-live/'; then
-              echo 'The site answers.'
+          for attempt in $(seq 1 24); do
+            if curl -fsS 'https://sarang-cmd.github.io/gemini-live/' | grep -q "$ASSET"; then
+              echo "The site serves $ASSET."
               exit 0
             fi
             sleep 10
           done
-          echo 'The site did not answer in time.' >&2
+          echo "The site does not serve $ASSET yet." >&2
           exit 1
