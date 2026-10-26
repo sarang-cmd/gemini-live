@@ -380,7 +380,9 @@ turns Pages on for the repository, with the branch as the publishing source and
 `build_type` `legacy`. The workflow in `.github/workflows/pages.yml` keeps that branch in
 step: it builds the site with `SITE_BASE=/gemini-live/`, writes the result to `gh-pages`
 and asks GitHub to publish it, because a push that uses the workflow token does not start a
-Pages build on its own.
+Pages build on its own. The last step of the workflow asks the public address for the page
+and looks for the file name of the build it made, so a run that does not reach the live site
+fails instead of passing quietly.
 
 **What was checked:** the published address was fetched from outside the repository and
 answers with the site, the four routes are served (`/download` returns the copy of
