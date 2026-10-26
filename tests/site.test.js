@@ -65,6 +65,13 @@ test('the copy does not use the "not X, but Y" shape', () => {
   assert.deepEqual(offenders, [], 'the copy must not lean on that construction');
 });
 
+test('the download page names the installers that were built', () => {
+  assert.match(contentSource, /Halo\.Setup\.2\.0\.0\.exe/);
+  assert.match(contentSource, /Halo-2\.0\.0\.AppImage/);
+  assert.match(contentSource, /halo_2\.0\.0_amd64\.deb/);
+  assert.match(contentSource, /releases\/tag\/v2\.0\.0/);
+});
+
 test('the site names both legal pages and marks the open questions', () => {
   assert.match(contentSource, /export const privacy/);
   assert.match(contentSource, /export const terms/);
