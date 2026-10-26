@@ -14,6 +14,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   root: import.meta.dirname,
   publicDir: false,
+  // The build is served from /web/ inside the marketing site, so the assets
+  // have to be addressed relative to the document.
+  base: './',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

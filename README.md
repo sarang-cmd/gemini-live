@@ -102,11 +102,45 @@ styling.
 ```bash
 npm run build        # out/main, out/preload, out/renderer
 npm run dist         # electron-builder → installers in release/
+./scripts/build-desktop.sh   # the same, with a readable error when the runtime is missing
 ```
 
 `electron-builder` is configured in `package.json`: a DMG + ZIP on macOS, NSIS + portable on
-Windows and an AppImage + deb on Linux. It downloads the Electron runtime for the target
-platform, so the first run needs network access.
+Windows and an AppImage + deb on Linux. The icon is `build/icon.png`.
+
+Packaging needs the Electron runtime for the target platform, and that runtime is not part
+of the npm package: it is downloaded from the GitHub releases when `npm install` runs. On a
+machine that cannot reach those releases, set `ELECTRON_MIRROR` to a mirror that is
+reachable, or unpack a runtime into `node_modules/electron/dist` by hand. The application
+build itself (`npm run build`) needs neither.
+
+---
+
+## The site
+
+```bash
+npm run site:dev      # http://localhost:5174
+npm run site:build    # site/dist, with the renderer copied to site/dist/web
+npm run site:preview  # serve the built site
+```
+
+`site/` is a small Vite + React + Tailwind 4 project. It has four pages: the overview, the
+download page, and drafts of the privacy policy and the terms of use.
+
+**The demo on the overview page is the real application.** The page embeds the shipping
+renderer in an iframe (`/web/index.html`, built by `npm run web:build`) rather than a
+screenshot of it, so what you see is the interface that ships. The answers in that frame are
+scripted, because the demo mode needs no API key, and the page says so.
+
+The site is deliberately plain: one warm off-white background, one green accent, Newsreader
+for the display type and Instrument Sans for everything else, both self-hosted so no request
+leaves the origin. There are no cookies, no analytics and no third party scripts. The
+interactions are Radix primitives (a dialog for the mobile menu, tabs for the two providers,
+an accordion for the questions) and Motion for the one reveal on the hero.
+
+`npm test` covers the site as well: the copy rules, the contrast of every colour pair, the
+rendered markup of all four pages, and the dialog, the tabs, the accordion, the copy button
+and the router in a DOM.
 
 ---
 
@@ -201,7 +235,13 @@ shared/                used by the browser app, the server and the renderer
   worklets/pcm-capture.js  worklets/pcm-player.js
 public/                the classic browser app (index.html, styles.css, js/)
 server/                the static host, the token minter, the SSE relay
-tests/                 75 tests, including a mock Gemini server and a mock Groq API
+site/                  the marketing site (Vite + React + Tailwind 4)
+  src/content.ts       every line of copy on the site
+  src/styles/          the design tokens and the stylesheet
+  src/components/      the header, the footer, the demo frame, the tabs, the accordion
+  src/pages/           overview, download, privacy, terms
+scripts/               build-desktop.sh, the packaging wrapper
+tests/                 92 tests, including a mock Gemini server, a mock Groq API and the site
 ```
 
 ### Why `components/ui` matters
@@ -238,15 +278,18 @@ levels up is `src/`, where the Tailwind entry point sits.
 npm run dev        # Electron with hot reload
 npm run web        # the renderer alone in a browser (no keys, demo mode)
 npm run server     # the classic web app on :8787
+npm run site:dev   # the marketing site on :5174
 npm run build      # production build of all three processes
+npm run site:build # production build of the site
 npm run typecheck  # tsc --noEmit
-npm test           # 75 unit + integration tests
+npm test           # 92 unit + integration tests
 ```
 
 The tests cover the wire protocol, the PCM helpers, the state machine, the worklets, the
 DOM contract of the web app, the Gemini session (against a mock WebSocket server), the Groq
-provider (against a mock HTTP API), the configuration rules, the orb's CSS contract and the
-orb's behaviour in a real DOM.
+provider (against a mock HTTP API), the configuration rules, the orb's CSS contract, the
+orb's behaviour in a real DOM and the marketing site (copy, contrast, markup and the
+interactive parts).
 
 ## Limitations
 

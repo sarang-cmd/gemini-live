@@ -8,5 +8,6 @@ release/
 .DS_Store
 coverage/
 dist/
-build/
+build/*
+!build/icon.png
 .tmp/

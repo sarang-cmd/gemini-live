@@ -6,15 +6,15 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const COMPONENT = path.join(ROOT, 'src/components/ui/ai-thinking-orb-and-input.tsx');
-const CSS = path.join(ROOT, 'src/index.css');
+const CSS = path.join(ROOT, 'shared/orb.css');
 
 const source = readFileSync(COMPONENT, 'utf8');
 const css = readFileSync(CSS, 'utf8');
 
 test('the orb component lives where shadcn expects it', () => {
   assert.ok(
-    /import\s+['"]\.\.\/\.\.\/index\.css['"]/.test(source),
-    'the component must import the app stylesheet',
+    /import\s+['"]\.\.\/\.\.\/\.\.\/shared\/orb\.css['"]/.test(source),
+    'the component must import the shared orb stylesheet',
   );
   assert.match(source, /export function MorphOrb/);
   assert.match(source, /export default MorphOrb/);
