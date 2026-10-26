@@ -31,6 +31,7 @@ test('the publish step names the repository, because the job has no checkout', (
   assert.match(publish, /--repo "\$REPO"/);
   assert.match(publish, /REPO: \$\{\{ github\.repository \}\}/);
   assert.match(publish, /gh release upload .*--clobber/);
+  assert.match(publish, /gh release edit .*--draft=false/);
 });
 
 test('the publish step takes the files, not the directory they were taken from', () => {

@@ -121,6 +121,9 @@ jobs:
               --notes "The desktop build of Halo: the NSIS installer and the portable exe for Windows, the AppImage and the deb for Linux." \
               "${files[@]}"
           fi
+          # A release whose tag was moved can be left as a draft, so it is
+          # published here as well.
+          gh release edit "$TAG" --repo "$REPO" --draft=false --latest
 
   repository:
     name: Add the installers to the repository
