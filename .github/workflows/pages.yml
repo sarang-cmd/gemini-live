@@ -1,0 +1,65 @@
+name: pages
+
+# Publishes the marketing site to GitHub Pages.
+#
+# The site is the same build that Vercel serves: `npm run site:build`. The
+# Vercel project sits behind the deployment protection of the account, which
+# asks a visitor to sign in, so the Pages site is the address that is open to
+# everyone.
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build the site
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      # GitHub Pages serves the site under the name of the repository.
+      SITE_BASE: /gemini-live/
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm install
+
+      - name: Build the site
+        run: npm run site:build
+
+      - name: Add the page for the routes that are not files
+        # The site has real paths, so a visitor who opens /download directly
+        # needs a page to answer with.
+        run: cp site/dist/index.html site/dist/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

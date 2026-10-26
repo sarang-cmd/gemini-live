@@ -25,7 +25,7 @@ export function AppFrame({ height = 620, caption }: Props) {
         }}
       >
         <iframe
-          src="/web/index.html"
+          src={`${import.meta.env.BASE_URL}web/index.html`}
           title="The Halo desktop application"
           loading="lazy"
           style={{

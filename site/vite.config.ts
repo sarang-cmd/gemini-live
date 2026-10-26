@@ -51,8 +51,10 @@ function rendererSite(): Plugin {
 
 export default defineConfig({
   root,
-  // The router uses real paths, so the assets have to be served from the root.
-  base: '/',
+  // The router uses real paths, so the assets are served from the root of the
+  // deployment. A site under a sub path, like the one GitHub Pages serves,
+  // sets SITE_BASE to that path.
+  base: process.env.SITE_BASE || '/',
   plugins: [react(), tailwindcss(), rendererSite()],
   resolve: {
     alias: {
