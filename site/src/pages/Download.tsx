@@ -18,6 +18,34 @@ export function Download() {
 
       <section className="grid gap-10 md:grid-cols-2" style={{ marginTop: 'var(--section)' }}>
         <div>
+          <h2 className="heading" style={{ fontSize: 'var(--step-3)', marginBottom: '0.75rem' }}>
+            {download.installersTitle}
+          </h2>
+          <p className="prose" style={{ marginBottom: '1.25rem' }}>
+            {download.installersLead}
+          </p>
+          <a className="btn btn-primary" href={download.releaseUrl}>
+            {download.releaseLabel}
+          </a>
+        </div>
+        <div>
+          <dl className="spec-list">
+            {download.installers.map(([term, detail]) => (
+              <div className="spec-row" key={term}>
+                <dt>{term}</dt>
+                <dd>{detail}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section style={{ marginTop: 'var(--section)' }}>
+        <p className="prose">{download.installersNote}</p>
+      </section>
+
+      <section className="grid gap-10 md:grid-cols-2" style={{ marginTop: 'var(--section)' }}>
+        <div>
           <h2 className="heading" style={{ fontSize: 'var(--step-3)', marginBottom: '1.25rem' }}>
             {download.stepsTitle}
           </h2>

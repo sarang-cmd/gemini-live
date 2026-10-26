@@ -181,9 +181,28 @@ export const faq = {
 export const download = {
   heading: 'Get Halo running',
   lead:
-    'Halo is a desktop app that you build and run on your own machine. Clone the repository, install the dependencies and start it. The whole build takes a couple of minutes.',
+    'Halo is a desktop app. Download the installer for Windows or Linux and it runs on your own machine. You can also clone the repository and start it from the source.',
   command:
     'git clone https://github.com/sarang-cmd/gemini-live.git && cd gemini-live && npm install && npm run dev',
+  installersTitle: 'The installers',
+  installersLead:
+    'Every tagged release carries the installers. They are built on the GitHub runners and published with the release. The current build is 2.0.0.',
+  installers: [
+    [
+      'Halo.Setup.2.0.0.exe',
+      'The Windows installer, 120 MB. It installs Halo and puts it in your start menu.',
+    ],
+    [
+      'Halo.2.0.0.exe',
+      'The portable Windows app, 108 MB. It runs from the folder you keep it in, with nothing installed.',
+    ],
+    ['Halo-2.0.0.AppImage', 'The Linux app image, 128 MB.'],
+    ['halo_2.0.0_amd64.deb', 'The Debian package, 100 MB.'],
+  ],
+  installersNote:
+    'The same files sit in the repository, under release. They are larger than GitHub takes in a normal commit, so they are kept in Git LFS, which Git for Windows ships with.',
+  releaseLabel: 'Open the release',
+  releaseUrl: 'https://github.com/sarang-cmd/gemini-live/releases/tag/v2.0.0',
   stepsTitle: 'What happens when you run it',
   steps: [
     ['npm install', 'Installs the renderer, the Electron shell and the test tooling.'],
