@@ -388,6 +388,12 @@ The first release is `v2.0.0`: `Halo.Setup.2.0.0.exe` (120 MB), `Halo.2.0.0.exe`
 committed to `release/` in the repository. They are past the 100 MB that GitHub takes in a
 normal commit, so they are kept in Git LFS, which `.gitattributes` declares.
 
+That build stopped before the window opened: the main process declared `__dirname` itself
+while electron-vite had already put a shim of that name in the bundle, and a module cannot
+declare the same name twice. The main process keeps the directory under a name of its own
+now, `v2.0.1` is the build that starts, and `tests/electron-main.test.js` parses the built
+main and the built preload the way Node does when Electron loads them.
+
 What the first run of the workflow showed, and what is now in it:
 
 - The deb package needs an author with an email address, so `package.json` has one.

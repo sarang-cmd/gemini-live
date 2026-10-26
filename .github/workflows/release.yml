@@ -40,6 +40,13 @@ jobs:
       - name: Build the application
         run: npm run build
 
+      - name: Clear the output folder
+        # The checkout brings the installers of the last build along, and
+        # electron-builder writes into the same folder.
+        shell: pwsh
+        run: |
+          if (Test-Path release) { Remove-Item -Recurse -Force release }
+
       - name: Package
         run: npx electron-builder --win --publish never
 
@@ -73,6 +80,11 @@ jobs:
 
       - name: Build the application
         run: npm run build
+
+      - name: Clear the output folder
+        # The checkout brings the installers of the last build along, and
+        # electron-builder writes into the same folder.
+        run: rm -rf release
 
       - name: Package
         run: npx electron-builder --linux --publish never

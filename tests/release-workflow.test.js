@@ -40,6 +40,21 @@ test('the publish step takes the files, not the directory they were taken from',
   assert.doesNotMatch(publish, /artifacts\/\*/);
 });
 
+test('the packaging starts from an empty output folder', () => {
+  const windows = workflow.slice(workflow.indexOf('  windows:'), workflow.indexOf('  linux:'));
+  const linux = workflow.slice(workflow.indexOf('  linux:'), workflow.indexOf('  release:'));
+  assert.match(windows, /Remove-Item -Recurse -Force release/);
+  assert.match(linux, /rm -rf release/);
+  assert.ok(
+    windows.indexOf('Clear the output folder') < windows.indexOf('electron-builder --win'),
+    'the folder is cleared before the installer is built',
+  );
+  assert.ok(
+    linux.indexOf('Clear the output folder') < linux.indexOf('electron-builder --linux'),
+    'the folder is cleared before the installer is built',
+  );
+});
+
 test('a failure on Linux does not keep the Windows installers from being released', () => {
   const linux = workflow.slice(workflow.indexOf('  linux:'), workflow.indexOf('  release:'));
   assert.match(linux, /continue-on-error: true/);
@@ -66,8 +81,8 @@ test('the repository keeps the installers in Git LFS, they are too large for a c
 
 test('the readme points at the release that holds the installers', () => {
   const readme = readFileSync(path.join(ROOT, 'README.md'), 'utf8');
-  assert.match(readme, /releases\/tag\/v2\.0\.0/);
-  assert.match(readme, /Halo\.Setup\.2\.0\.0\.exe/);
+  assert.match(readme, /releases\/tag\/v2\.0\.1/);
+  assert.match(readme, /Halo\.Setup\.2\.0\.1\.exe/);
 });
 
 test('the package has an author with an email address, which the deb needs', () => {
