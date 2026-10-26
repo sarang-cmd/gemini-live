@@ -367,7 +367,23 @@ used for the deployment cannot change that account setting, so it has to be turn
 dashboard (Settings, Deployment Protection, Disabled) before the site is reachable by anyone
 who is not logged into Vercel.
 
-## 19. The desktop build
+## 19. The installers
+
+`electron-builder` is configured in `package.json` (a DMG and a ZIP on macOS, NSIS and a
+portable exe on Windows, an AppImage and a deb on Linux) and the icon is `build/icon.png`.
+Building those installers needs the Electron runtime for the target platform, and the
+runtime is downloaded from the GitHub releases, which is often blocked.
+
+Two answers to that:
+
+- On a developer machine, `npm run electron:install` runs the download again and prints the
+  mirror instructions when it fails. `scripts/build-desktop.sh` does the same for the
+  packaging step.
+- In the open, `.github/workflows/release.yml` builds the installers on real Windows and
+  Linux runners, which have the network access the sandbox does not, and publishes them in
+  the GitHub release for the pushed tag.
+
+## 20. The desktop build
 
 `npm run dist` runs `electron-vite build` and then `electron-builder`, which is configured in
 the `build` field of `package.json`: a DMG and a ZIP on macOS, NSIS and a portable exe on

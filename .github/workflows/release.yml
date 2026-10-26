@@ -1,0 +1,100 @@
+name: release
+
+# Builds the desktop installers and publishes them as a GitHub release.
+#
+# The workflow runs on real Windows and Linux runners, so the installer is
+# produced with the tools of that operating system: the NSIS installer and
+# the portable exe on Windows, the AppImage and the deb on Linux.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag for the release, for example v2.0.0. Leave empty to build without releasing.'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm install
+
+      - name: Build the application
+        run: npm run build
+
+      - name: Package
+        run: npx electron-builder --win --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            release/*.exe
+            release/*.blockmap
+            release/*.yml
+            if-no-files-found: error
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm install
+
+      - name: Build the application
+        run: npm run build
+
+      - name: Package
+        run: npx electron-builder --linux --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/*.blockmap
+            release/*.yml
+            if-no-files-found: error
+
+  release:
+    name: Release
+    needs: [windows, linux]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || inputs.tag != ''
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+        run: |
+          gh release create "$TAG" artifacts/* \
+            --title "Halo $TAG" \
+            --notes "The desktop build of Halo: the NSIS installer and the portable exe for Windows, the AppImage and the deb for Linux."
