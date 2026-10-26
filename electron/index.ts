@@ -11,14 +11,22 @@ import { fileURLToPath } from 'node:url';
 
 import { registerIpc } from './ipc.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+/**
+ * The directory this file sits in.
+ *
+ * The name is not the one the CommonJS shims use on purpose: electron-vite
+ * puts that name in the main bundle when the code needs it, and a second
+ * declaration of it in the same module stops the app before the window
+ * opens, with "Identifier '__dirname' has already been declared".
+ */
+const appDir = path.dirname(fileURLToPath(import.meta.url));
 
 let mainWindow: BrowserWindow | null = null;
 
 function rendererUrl(): string {
   const devServer = process.env['ELECTRON_RENDERER_URL'];
   if (devServer) return devServer;
-  return `file://${path.join(__dirname, '../renderer/index.html')}`;
+  return `file://${path.join(appDir, '../renderer/index.html')}`;
 }
 
 function createWindow(): BrowserWindow {
@@ -44,7 +52,7 @@ function createWindow(): BrowserWindow {
           },
         }),
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.cjs'),
+      preload: path.join(appDir, '../preload/index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
