@@ -175,10 +175,15 @@ npm run site:preview  # serve the built site
 `site/` is a small Vite + React + Tailwind 4 project. It has four pages: the overview, the
 download page, and drafts of the privacy policy and the terms of use.
 
-**Live**: <https://halo-sarang-dev.vercel.app>. It is built on Vercel straight from this
-repository: the project runs `npm run site:build`, serves `site/dist` and rewrites the four
-client side routes to `index.html`. `vercel.json` holds the build command, the output
-directory, that rewrite and the cache headers for the hashed assets.
+**Live**: <https://sarang-cmd.github.io/gemini-live/>. GitHub Pages serves that address from
+the `gh-pages` branch of this repository, and `.github/workflows/pages.yml` builds the site
+and refreshes that branch on every merge to `main`.
+
+The same build also runs on Vercel, at <https://halo-sarang-dev.vercel.app>. That project
+runs `npm run site:build`, serves `site/dist` and rewrites the four client side routes to
+`index.html`; `vercel.json` holds the build command, the output directory, that rewrite and
+the cache headers for the hashed assets. The Vercel account keeps its deployments behind a
+Vercel sign in, so the Pages address is the one to share.
 
 **The demo on the overview page is the real application.** The page embeds the shipping
 renderer in an iframe (`/web/index.html`, built by `npm run web:build`) rather than a
@@ -294,7 +299,7 @@ site/                  the marketing site (Vite + React + Tailwind 4)
   src/components/      the header, the footer, the demo frame, the tabs, the accordion
   src/pages/           overview, download, privacy, terms
 scripts/               build-desktop.sh, the packaging wrapper
-tests/                 92 tests, including a mock Gemini server, a mock Groq API and the site
+tests/                 109 tests, including a mock Gemini server, a mock Groq API and the site
 ```
 
 ### Why `components/ui` matters
@@ -335,7 +340,7 @@ npm run site:dev   # the marketing site on :5174
 npm run build      # production build of all three processes
 npm run site:build # production build of the site, the same command Vercel runs
 npm run typecheck  # tsc --noEmit
-npm test           # 92 unit + integration tests
+npm test           # 109 unit + integration tests
 ```
 
 The tests cover the wire protocol, the PCM helpers, the state machine, the worklets, the

@@ -1,6 +1,6 @@
 # Halo — Siri-style voice assistant on the Gemini Live API
 
-**Implementation plan** · repo `sarang-cmd/gemini-live` · status: **executed** · 92 tests green
+**Implementation plan** · repo `sarang-cmd/gemini-live` · status: **executed** · 109 tests green
 · phase 1: the web app (50 tests) · phase 2: the Electron desktop app (25 more tests)
 · phase 3: the marketing site (17 more tests) and the packaging script
 
@@ -293,7 +293,7 @@ npm run dev        # Electron with hot reload
 npm run web        # the renderer alone, in a browser, in demo mode
 npm run build      # production build of all three processes
 npm run typecheck  # tsc --noEmit
-npm test           # 92 tests
+npm test           # 109 tests
 ```
 
 ---
@@ -313,7 +313,7 @@ so no request leaves the origin. The rules that shaped it:
   says so.
 - **No invented evidence.** Every model name, voice count and price is taken from the code:
   `gemini-3.8-live`, `whisper-large-v3-turbo`, `canopylabs/orpheus-v1-english`, the 30
-  voices in `shared/voices.js`, the 75 (now 92) tests. No testimonials, no logos, no
+  voices in `shared/voices.js`, the 109 tests. No testimonials, no logos, no
   "trusted by" row, no numbers that were not measured.
 - **The legal pages are drafts.** The privacy page and the terms of use describe what the
   software actually does. Where a legal entity, a jurisdiction or a contact address would be
@@ -352,7 +352,7 @@ site/
 | The frame | the renderer build has to address its assets relatively, or it breaks under `/web/`; a test keeps it that way |
 | The page in a browser | **not possible in the sandbox** — no browser binary and no way to fetch one, so the layout was reviewed in the stylesheet and in the rendered markup, not on a screen. The desktop and the mobile widths were reasoned about, not looked at. |
 
-## 18. The site on Vercel
+## 18. The site on Vercel and on GitHub Pages
 
 The project `halo` is connected to this repository on Vercel. `vercel.json` at the root holds
 the build command (`npm run site:build`), the output directory (`site/dist`), the catch-all
@@ -361,11 +361,31 @@ rewrite that serves the four client side routes, the cache headers for the hashe
 
 The production alias is `halo-sarang-dev.vercel.app`.
 
-**What could not be done here:** the Vercel account has Deployment Protection switched on for
-every deployment, so the URL answers with a Vercel login instead of the page. The connector
-used for the deployment cannot change that account setting, so it has to be turned off in the
-dashboard (Settings, Deployment Protection, Disabled) before the site is reachable by anyone
-who is not logged into Vercel.
+**What could not be done there:** the Vercel account has Deployment Protection switched on
+for every deployment, so that URL answers with a Vercel login instead of the page. The
+connector used for the deployment cannot change that account setting, and neither the
+account nor a new team inherits a different default, so it has to be turned off in the
+dashboard (Settings, Deployment Protection, Disabled) for that address to answer anyone who
+is not logged into Vercel.
+
+### The public address
+
+The address that is open to everyone is `https://sarang-cmd.github.io/gemini-live/`, served
+by GitHub Pages from the `gh-pages` branch of this repository.
+
+Pages had never been enabled for the repository, and the token in use is not allowed to
+create a Pages site (the API answers `403 Resource not accessible by integration`), so the
+site was switched on by pushing the branch: a `gh-pages` branch with the built site in it
+turns Pages on for the repository, with the branch as the publishing source and
+`build_type` `legacy`. The workflow in `.github/workflows/pages.yml` keeps that branch in
+step: it builds the site with `SITE_BASE=/gemini-live/`, writes the result to `gh-pages`
+and asks GitHub to publish it, because a push that uses the workflow token does not start a
+Pages build on its own.
+
+**What was checked:** the published address was fetched from outside the repository and
+answers with the site, the four routes are served (`/download` returns the copy of
+`index.html` that GitHub Pages uses for a path it does not know, and the router takes over
+from there), and the renderer build inside `/web/` loads with its own relative asset paths.
 
 ## 19. The installers
 
@@ -383,8 +403,8 @@ Two answers to that:
   Linux runners, which have the network access the sandbox does not, and publishes them in
   the GitHub release for the pushed tag.
 
-The first release is `v2.0.0`: `Halo.Setup.2.0.0.exe` (120 MB), `Halo.2.0.0.exe` (108 MB),
-`Halo-2.0.0.AppImage` (128 MB) and `halo_2.0.0_amd64.deb` (100 MB). The same files are
+The first release is `v2.0.1`: `Halo.Setup.2.0.1.exe` (120 MB), `Halo.2.0.1.exe` (108 MB),
+`Halo-2.0.1.AppImage` (128 MB) and `halo_2.0.1_amd64.deb` (100 MB). The same files are
 committed to `release/` in the repository. They are past the 100 MB that GitHub takes in a
 normal commit, so they are kept in Git LFS, which `.gitattributes` declares.
 
