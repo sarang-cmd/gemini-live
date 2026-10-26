@@ -1,0 +1,6 @@
+# The installers are larger than the 100 MB that GitHub accepts in a normal
+# commit, so they are kept in Git LFS. Git for Windows ships with Git LFS, so
+# a clone on Windows fetches them without another installation.
+release/*.exe filter=lfs diff=lfs merge=lfs -text
+release/*.AppImage filter=lfs diff=lfs merge=lfs -text
+release/*.deb filter=lfs diff=lfs merge=lfs -text
