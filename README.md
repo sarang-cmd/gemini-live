@@ -101,11 +101,12 @@ styling.
 
 ```bash
 npm run build        # out/main, out/preload, out/renderer
-npm run dist         # electron-builder → a distributable in dist/
+npm run dist         # electron-builder → installers in release/
 ```
 
-`electron-builder` is not installed by default; add it with
-`npm i -D electron-builder` and a `build` section to `package.json` when you want installers.
+`electron-builder` is configured in `package.json`: a DMG + ZIP on macOS, NSIS + portable on
+Windows and an AppImage + deb on Linux. It downloads the Electron runtime for the target
+platform, so the first run needs network access.
 
 ---
 

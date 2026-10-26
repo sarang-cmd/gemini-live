@@ -1,4 +1,4 @@
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { Mic, Volume2, VolumeX } from 'lucide-react';
 
 interface Voice {
   name: string;
@@ -92,11 +92,11 @@ export function VoiceDock({
           }`}
         />
 
-        {recording ? (
-          <Mic className="relative text-sky-200" size={22} strokeWidth={2} />
-        ) : (
-          <MicOff className="relative text-white/70" size={22} strokeWidth={1.8} />
-        )}
+        <Mic
+          className={`relative ${recording ? 'text-sky-200' : 'text-white/75'}`}
+          size={22}
+          strokeWidth={recording ? 2.2 : 1.8}
+        />
       </button>
 
       <p className="pointer-events-none pr-1 text-[11px] text-white/35">
