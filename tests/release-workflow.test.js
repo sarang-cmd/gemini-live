@@ -33,6 +33,12 @@ test('the publish step names the repository, because the job has no checkout', (
   assert.match(publish, /gh release upload .*--clobber/);
 });
 
+test('the publish step takes the files, not the directory they were taken from', () => {
+  const publish = workflow.slice(workflow.indexOf('- name: Publish'));
+  assert.match(publish, /find artifacts -type f/);
+  assert.doesNotMatch(publish, /artifacts\/\*/);
+});
+
 test('a failure on Linux does not keep the Windows installers from being released', () => {
   const linux = workflow.slice(workflow.indexOf('  linux:'), workflow.indexOf('  release:'));
   assert.match(linux, /continue-on-error: true/);
