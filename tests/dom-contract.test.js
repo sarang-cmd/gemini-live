@@ -13,6 +13,10 @@ function scriptFiles() {
   return readdirSync(path.join(ROOT, 'public/js')).filter((file) => file.endsWith('.js'));
 }
 
+function sharedFiles() {
+  return readdirSync(path.join(ROOT, 'shared')).filter((file) => file.endsWith('.js'));
+}
+
 test('every element id referenced by the app exists in the markup', () => {
   const missing = [];
 
@@ -66,28 +70,44 @@ test('the stylesheet ships rules for the classes the app toggles', () => {
 test('the app boots the modules it needs', () => {
   const app = readFileSync(path.join(ROOT, 'public/js/app.js'), 'utf8');
   for (const module of [
-    './voices.js',
-    './models.js',
-    './audio.js',
+    '../shared/voices.js',
+    '../shared/models.js',
+    '../shared/audio.js',
     './orb.js',
-    './session.js',
+    '../shared/session.js',
     './demo.js',
-    './state.js',
-    './protocol.js',
+    '../shared/state.js',
+    '../shared/protocol.js',
   ]) {
     assert.ok(app.includes(`'${module}'`), `app.js does not import ${module}`);
   }
 });
 
 test('the worklets are reachable at the paths the engine loads', () => {
-  const audio = readFileSync(path.join(ROOT, 'public/js/audio.js'), 'utf8');
+  const audio = readFileSync(path.join(ROOT, 'shared/audio.js'), 'utf8');
   assert.match(audio, /'\/worklets\/pcm-capture\.js'/);
   assert.match(audio, /'\/worklets\/pcm-player\.js'/);
   for (const file of ['pcm-capture.js', 'pcm-player.js']) {
     assert.ok(
-      readFileSync(path.join(ROOT, 'public/worklets', file), 'utf8').includes(
+      readFileSync(path.join(ROOT, 'shared/worklets', file), 'utf8').includes(
         'registerProcessor',
       ),
+    );
+  }
+});
+
+test('the shared modules are free of DOM-only assumptions', () => {
+  // The Electron renderer imports these directly, so they must not reach for
+  // browser globals at module scope.
+  for (const file of sharedFiles()) {
+    const source = readFileSync(path.join(ROOT, 'shared', file), 'utf8');
+    assert.ok(
+      !/^\s*document\./m.test(source),
+      `shared/${file} touches document at module scope`,
+    );
+    assert.ok(
+      !/^\s*window\./m.test(source),
+      `shared/${file} touches window at module scope`,
     );
   }
 });
@@ -100,9 +120,15 @@ test('every asset the page references exists on disk', () => {
   }
   for (const file of scriptFiles()) {
     const source = readFileSync(path.join(ROOT, 'public/js', file), 'utf8');
-    for (const match of source.matchAll(/from '\.\/([^']+)'/g)) {
-      assets.add(`/js/${match[1]}`);
+    for (const match of source.matchAll(/from '\.\.\/shared\/([^']+)'/g)) {
+      assets.add(`/shared/${match[1]}`);
     }
+    for (const match of source.matchAll(/'(\/worklets\/[^']+)'/g)) {
+      assets.add(match[1]);
+    }
+  }
+  for (const file of sharedFiles()) {
+    const source = readFileSync(path.join(ROOT, 'shared', file), 'utf8');
     for (const match of source.matchAll(/'(\/worklets\/[^']+)'/g)) {
       assets.add(match[1]);
     }
@@ -110,7 +136,8 @@ test('every asset the page references exists on disk', () => {
 
   assert.ok(assets.size >= 8, `only found ${assets.size} assets`);
   for (const asset of assets) {
-    const file = path.join(ROOT, 'public', asset.replace(/^\//, ''));
+    const base = asset.startsWith('/worklets/') ? 'shared/worklets' : asset.startsWith('/shared/') ? 'shared' : 'public';
+    const file = path.join(ROOT, base, asset.replace(/^\/(shared\/|worklets\/)?/, ''));
     assert.ok(existsSync(file), `missing asset ${asset}`);
   }
 });

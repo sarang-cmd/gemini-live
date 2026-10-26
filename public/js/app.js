@@ -4,14 +4,14 @@
  * Owns the DOM, the settings, the conversation state machine and the wiring
  * between the audio engine, the orb and whichever session transport is active.
  */
-import { VOICES, DEFAULT_VOICE } from './voices.js';
-import { MODELS, DEFAULT_MODEL } from './models.js';
-import { AudioEngine } from './audio.js';
+import { VOICES, DEFAULT_VOICE } from '../shared/voices.js';
+import { MODELS, DEFAULT_MODEL } from '../shared/models.js';
+import { AudioEngine } from '../shared/audio.js';
 import { Orb } from './orb.js';
-import { DirectSession, ProxySession } from './session.js';
+import { DirectSession, ProxySession } from '../shared/session.js';
 import { DemoSession } from './demo.js';
-import { createStateMachine, STATES, stateLabel, stateHint } from './state.js';
-import { liveSocketUrl, buildSetupMessage, functionDeclaration } from './protocol.js';
+import { createStateMachine, STATES, stateLabel, stateHint } from '../shared/state.js';
+import { liveSocketUrl, buildSetupMessage, functionDeclaration } from '../shared/protocol.js';
 
 const $ = (id) => document.getElementById(id);
 const STORAGE_KEY = 'halo.settings.v1';

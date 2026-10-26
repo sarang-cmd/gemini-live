@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 function loadWorklet(file, sampleRate) {
-  const code = readFileSync(path.join(ROOT, 'public/worklets', file), 'utf8');
+  const code = readFileSync(path.join(ROOT, 'shared/worklets', file), 'utf8');
   const registry = {};
 
   class BaseProcessor {

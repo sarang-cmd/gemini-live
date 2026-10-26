@@ -7,7 +7,7 @@ import {
   canTransition,
   stateLabel,
   stateHint,
-} from '../public/js/state.js';
+} from '../shared/state.js';
 
 test('the happy path walks idle → connecting → listening → thinking → speaking', () => {
   const seen = [];

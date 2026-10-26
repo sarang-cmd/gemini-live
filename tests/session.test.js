@@ -5,9 +5,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { startMockGemini, fakeResponse } from './helpers/mock-gemini.js';
-import { DirectSession, ProxySession } from '../public/js/session.js';
+import { DirectSession, ProxySession } from '../shared/session.js';
 import { createProxyHub } from '../server/proxy.js';
-import { buildSetupMessage } from '../public/js/protocol.js';
+import { buildSetupMessage } from '../shared/protocol.js';
 
 const setup = buildSetupMessage({
   model: 'gemini-3.8-live',

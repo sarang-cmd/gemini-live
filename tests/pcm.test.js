@@ -8,7 +8,7 @@ import {
   int16ToFloat,
   rmsInt16,
   int16ToWav,
-} from '../public/js/pcm.js';
+} from '../shared/pcm.js';
 
 test('base64 round trip preserves the samples', () => {
   const source = new Int16Array([-32768, -1, 0, 1, 12345, 32767]);

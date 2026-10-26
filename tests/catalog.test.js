@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { VOICES, DEFAULT_VOICE, getVoice, isValidVoice } from '../public/js/voices.js';
-import { MODELS, DEFAULT_MODEL } from '../public/js/models.js';
+import { VOICES, DEFAULT_VOICE, getVoice, isValidVoice } from '../shared/voices.js';
+import { MODELS, DEFAULT_MODEL } from '../shared/models.js';
 
 test('the catalog contains the 30 prebuilt Gemini voices', () => {
   assert.equal(VOICES.length, 30);

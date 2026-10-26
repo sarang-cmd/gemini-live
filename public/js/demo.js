@@ -6,8 +6,8 @@
  * without an API key. The "voice" is a synthetic mumble that drives the same
  * playback path the Live API uses.
  */
-import { SessionAdapter } from './session.js';
-import { int16ToBase64 } from './pcm.js';
+import { SessionAdapter } from '../shared/session.js';
+import { int16ToBase64 } from '../shared/pcm.js';
 
 const SAMPLE_RATE = 24000;
 

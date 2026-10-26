@@ -1,6 +1,7 @@
 # Halo — Siri-style voice assistant on the Gemini Live API
 
-**Implementation plan** · repo `sarang-cmd/gemini-live` · status: **executed** · 50 tests green
+**Implementation plan** · repo `sarang-cmd/gemini-live` · status: **executed** · 75 tests green
+· phase 1: the web app (50 tests) · phase 2: the Electron desktop app (25 more tests)
 
 ---
 
@@ -177,3 +178,119 @@ without touching the network.
 ## 10. Future roadmap
 Persistent memory, camera frames (Gemini supports 1 FPS video), Live Avatar video output,
 multi-speaker TTS, PWA install, server-side session analytics.
+
+
+---
+
+# Phase 2 — the desktop app
+
+> *"can you buold this as a electron app"* + *"use the folloiwng react component as the ai
+> when the asnwers arwe resposnding. clone siri"* + *"can you use groq also"*
+
+## 11. Goal
+
+Turn Halo into a real desktop application and make the pasted `MorphOrb` component the
+assistant surface:
+
+- **Electron** shell around the existing brain.
+- **React 19 + TypeScript + Tailwind 4 + shadcn** structure, so the project matches what the
+  component expects.
+- The pasted component lives in `src/components/ui/ai-thinking-orb-and-input.tsx` and drives
+  every answer: the orb is the AI while it thinks and while it answers.
+- **Groq** as a second provider, next to Gemini.
+
+## 12. What the research changed
+
+| Finding | Consequence |
+|---|---|
+| Groq **retired PlayAI** on 31 Dec 2025 — TTS is now **Canopy Labs Orpheus** | `canopylabs/orpheus-v1-english` (`autumn`, `diana`, `hannah`, `austin`, `daniel`, `troy`) and `canopylabs/orpheus-v1-arabic-saudi` (`fahad`, `sultan`, `lulwa`, `noura`). Shipping `playai-tts` would 404. |
+| Orpheus returns **WAV** | The renderer decodes it with the same `AudioContext` that plays the Live API's PCM. |
+| Groq STT is `whisper-large-v3-turbo` over `multipart/form-data` | The renderer records 16 kHz PCM16 → WAV → IPC → main process → `POST /audio/transcriptions`. |
+| Groq chat is an **OpenAI-compatible SSE stream** | The main process streams the deltas back over IPC so the transcript fills in live. |
+| Vite cannot import from `public/` | The shared modules moved to `shared/` and the server learned the `/shared/*` and `/worklets/*` routes. |
+
+## 13. Architecture
+
+```
+ Electron main (electron/)                Renderer (src/, React 19)
+┌───────────────────────────┐             ┌──────────────────────────────┐
+│ config.json — the keys    │             │ MorphOrb — the assistant     │
+│ providers/gemini.ts       │   IPC       │   idle→launch→assemble→think │
+│   mint an ephemeral token │ ──────────► │   →resolve→condense→unfold  │
+│ providers/groq.ts         │ ◄───────── │ VoiceDock, history, settings │
+│   chat / whisper / tts    │             │ lib/assistant.ts — the ask   │
+└───────────────────────────┘             └──────────────────────────────┘
+```
+
+- `contextIsolation: true`, `nodeIntegration: false`, `sandbox: false`.
+- The renderer only sees `window.halo` — a hand-written context bridge. It never sees a key.
+- The microphone permission is granted automatically for the app's own content.
+
+### The shared refactor
+
+`protocol.js`, `pcm.js`, `voices.js`, `models.js`, `state.js`, `session.js`, `audio.js` and the
+two worklets moved from `public/` to `shared/`. The web app now imports them from
+`../shared/…`, the server serves `/shared/*` and `/worklets/*`, and the React renderer imports
+the same files — one wire format, four consumers.
+
+### The orb contract
+
+The component publishes every animated value as a CSS custom property, so the stylesheet owns
+the look and the component only writes numbers:
+
+| Element | Variables |
+|---|---|
+| `.mo-actor` | `--w --h --r --oGlow --oHalo --oPill --oBall --oGreen --oCard --oRing --oInput --oAur --gs --cs --hOp --dotS --bloom` |
+| `.mo-status` | `--sOp --sTy` |
+| `.mo-root` | `--oCenter` |
+| `.mo-input` | `--inScale` |
+
+Phases: `idle → launch → assemble → think → resolve → condense → unfold → answered → reset`.
+The canvas is 220 px; the comet trail is six `.mo-trail` ghosts; the answer words are
+`.mo-w` spans revealed by `--wp`; `Esc` aborts; `?debug` adds a speed slider and a replay.
+
+### Talking to the orb
+
+The voice pipeline must not reach into the component. It dispatches a `halo:ask` event:
+
+```ts
+window.dispatchEvent(new CustomEvent('halo:ask', { detail: { text } }));
+```
+
+The component listens, fills its field and starts the timeline — the same path a typed
+question takes. (A DOM-level trick — native value setter + `requestSubmit()` — was the first
+idea; React 19 only reacts to `input` in a real browser and falls back to its selection
+polyfill elsewhere, so the event contract is both simpler and testable.)
+
+## 14. The build
+
+| Piece | Choice |
+|---|---|
+| Bundler | `electron-vite` — main (ESM), preload (CJS), renderer (Vite 8) |
+| Renderer root | the project root, so `src/index.css` and `src/components/ui/` match the shadcn layout |
+| Styles | Tailwind 4 (`@import "tailwindcss"`), `tw-animate-css`, plus the hand-written `.mo-*` sheet |
+| Icons | `lucide-react` |
+| Images | Unsplash backgrounds, with a graceful fallback to the generated aurora |
+| Config | `components.json` (shadcn) + `tsconfig.json` paths `@/* → ./src/*` |
+
+## 15. What was verified — and what could not be
+
+| Check | Result |
+|---|---|
+| `tsc --noEmit` | clean |
+| `electron-vite build` | main + preload + renderer, worklets emitted as real files (`assetsInlineLimit: 0`, because a `data:` URL would be blocked by the CSP) |
+| `npm test` | **75 green** — the 50 from phase 1 plus 25 new ones |
+| The renderer mounts | `react-dom/server` renders the whole shell in `tests/renderer-smoke.test.js` |
+| The orb in a real DOM | jsdom mounts the component, asks it a question and watches `onSubmit` fire (`tests/orb-interaction.test.js`) |
+| The Groq provider | a mock HTTP API covers multipart upload, SSE streaming, the error body and the network failure (`tests/groq-provider.test.js`) |
+| The Electron GUI | **not launchable in the sandbox** — `release-assets.githubusercontent.com` is outside the egress allowlist, so the Electron binary cannot be downloaded. The build, the typecheck and the headless tests stand in for it. |
+
+## 16. Scripts
+
+```bash
+npm run dev        # Electron with hot reload
+npm run web        # the renderer alone, in a browser, in demo mode
+npm run build      # production build of all three processes
+npm run typecheck  # tsc --noEmit
+npm test           # 75 tests
+```

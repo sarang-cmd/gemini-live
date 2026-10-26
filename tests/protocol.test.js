@@ -11,7 +11,7 @@ import {
   parseServerMessage,
   functionDeclaration,
   AUDIO_IN_MIME,
-} from '../public/js/protocol.js';
+} from '../shared/protocol.js';
 
 test('liveSocketUrl uses the constrained service for ephemeral tokens', () => {
   const url = liveSocketUrl({ token: 'abc/def+ghi' });

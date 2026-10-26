@@ -18,7 +18,7 @@ import {
   buildToolResponseMessage,
   buildAudioStreamEndMessage,
   parseServerMessage,
-} from '../public/js/protocol.js';
+} from '../shared/protocol.js';
 
 const SESSION_TTL_MS = 5 * 60_000;
 

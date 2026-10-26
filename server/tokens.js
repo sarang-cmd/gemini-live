@@ -11,7 +11,7 @@
  * is stricter but the constraint check compares against the wire setup frame, so
  * it stays opt-in via GEMINI_LOCK_TOKENS=true.
  */
-import { LIVE_API_VERSION } from '../public/js/protocol.js';
+import { LIVE_API_VERSION } from '../shared/protocol.js';
 
 const AUTH_TOKENS_URL = `https://generativelanguage.googleapis.com/${LIVE_API_VERSION}/auth_tokens`;
 

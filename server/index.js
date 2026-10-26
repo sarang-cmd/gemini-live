@@ -17,12 +17,13 @@ import { fileURLToPath } from 'node:url';
 import { loadEnv } from './env.js';
 import { createEphemeralToken, TokenError } from './tokens.js';
 import { createProxyHub } from './proxy.js';
-import { VOICES, DEFAULT_VOICE } from '../public/js/voices.js';
-import { MODELS, DEFAULT_MODEL } from '../public/js/models.js';
+import { VOICES, DEFAULT_VOICE } from '../shared/voices.js';
+import { MODELS, DEFAULT_MODEL } from '../shared/models.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
+const SHARED_DIR = path.join(ROOT, 'shared');
 
 loadEnv(path.join(ROOT, '.env'));
 
@@ -97,12 +98,30 @@ async function readJsonBody(req, limit = 2_000_000) {
   });
 }
 
-/** Serve a file from `public/`, refusing anything that escapes the directory. */
-async function serveStatic(req, res, pathname) {
-  const relative = decodeURIComponent(pathname).replace(/^\/+/, '') || 'index.html';
-  const target = path.resolve(PUBLIC_DIR, relative);
+/**
+ * Map a URL onto a directory.
+ *
+ * The browser app lives in `public/`, but the modules it shares with the
+ * Electron renderer now live in `shared/` (Vite cannot import out of
+ * `public/`). The worklets keep their historical `/worklets/*` URLs.
+ */
+function staticBase(pathname) {
+  if (pathname.startsWith('/shared/')) {
+    return { dir: SHARED_DIR, prefix: '/shared/' };
+  }
+  if (pathname.startsWith('/worklets/')) {
+    return { dir: path.join(SHARED_DIR, 'worklets'), prefix: '/worklets/' };
+  }
+  return { dir: PUBLIC_DIR, prefix: '/' };
+}
 
-  if (target !== PUBLIC_DIR && !target.startsWith(PUBLIC_DIR + path.sep)) {
+/** Serve a file from `public/` (or `shared/`), refusing anything that escapes the directory. */
+async function serveStatic(req, res, pathname) {
+  const { dir, prefix } = staticBase(pathname);
+  const relative = decodeURIComponent(pathname.slice(prefix.length)) || 'index.html';
+  const target = path.resolve(dir, relative);
+
+  if (target !== dir && !target.startsWith(dir + path.sep)) {
     sendText(res, 403, 'Forbidden');
     return;
   }
