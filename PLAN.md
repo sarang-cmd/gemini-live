@@ -1,6 +1,6 @@
 # Halo — Siri-style voice assistant on the Gemini Live API
 
-**Implementation plan** · repo `sarang-cmd/gemini-live` · status: **executed** · 109 tests green
+**Implementation plan** · repo `sarang-cmd/gemini-live` · status: **executed** · 117 tests green
 · phase 1: the web app (50 tests) · phase 2: the Electron desktop app (25 more tests)
 · phase 3: the marketing site (17 more tests) and the packaging script
 
@@ -293,7 +293,7 @@ npm run dev        # Electron with hot reload
 npm run web        # the renderer alone, in a browser, in demo mode
 npm run build      # production build of all three processes
 npm run typecheck  # tsc --noEmit
-npm test           # 109 tests
+npm test           # 117 tests
 ```
 
 ---
@@ -313,7 +313,7 @@ so no request leaves the origin. The rules that shaped it:
   says so.
 - **No invented evidence.** Every model name, voice count and price is taken from the code:
   `gemini-3.8-live`, `whisper-large-v3-turbo`, `canopylabs/orpheus-v1-english`, the 30
-  voices in `shared/voices.js`, the 109 tests. No testimonials, no logos, no
+  voices in `shared/voices.js`, the 117 tests. No testimonials, no logos, no
   "trusted by" row, no numbers that were not measured.
 - **The legal pages are drafts.** The privacy page and the terms of use describe what the
   software actually does. Where a legal entity, a jurisdiction or a contact address would be
@@ -388,6 +388,11 @@ fails instead of passing quietly.
 answers with the site, the four routes are served (`/download` returns the copy of
 `index.html` that GitHub Pages uses for a path it does not know, and the router takes over
 from there), and the renderer build inside `/web/` loads with its own relative asset paths.
+
+One thing to expect in the Actions tab: GitHub keeps a record of every push to the branch,
+and the record for a push that carries the workflow token fails, because GitHub does not
+run a build for a push it did not trust. The build the workflow asks for is the one that
+publishes, and the run fails if the address does not serve that build afterwards.
 
 ## 19. The installers
 

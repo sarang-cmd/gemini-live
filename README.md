@@ -299,7 +299,7 @@ site/                  the marketing site (Vite + React + Tailwind 4)
   src/components/      the header, the footer, the demo frame, the tabs, the accordion
   src/pages/           overview, download, privacy, terms
 scripts/               build-desktop.sh, the packaging wrapper
-tests/                 109 tests, including a mock Gemini server, a mock Groq API and the site
+tests/                 117 tests, including a mock Gemini server, a mock Groq API and the site
 ```
 
 ### Why `components/ui` matters
@@ -340,7 +340,7 @@ npm run site:dev   # the marketing site on :5174
 npm run build      # production build of all three processes
 npm run site:build # production build of the site, the same command Vercel runs
 npm run typecheck  # tsc --noEmit
-npm test           # 109 unit + integration tests
+npm test           # 117 unit + integration tests
 ```
 
 The tests cover the wire protocol, the PCM helpers, the state machine, the worklets, the
