@@ -352,7 +352,22 @@ site/
 | The frame | the renderer build has to address its assets relatively, or it breaks under `/web/`; a test keeps it that way |
 | The page in a browser | **not possible in the sandbox** — no browser binary and no way to fetch one, so the layout was reviewed in the stylesheet and in the rendered markup, not on a screen. The desktop and the mobile widths were reasoned about, not looked at. |
 
-## 18. The desktop build
+## 18. The site on Vercel
+
+The project `halo` is connected to this repository on Vercel. `vercel.json` at the root holds
+the build command (`npm run site:build`), the output directory (`site/dist`), the catch-all
+rewrite that serves the four client side routes, the cache headers for the hashed assets and
+`ELECTRON_SKIP_BINARY_DOWNLOAD`, because the site does not need the Electron runtime.
+
+The production alias is `halo-sarang-dev.vercel.app`.
+
+**What could not be done here:** the Vercel account has Deployment Protection switched on for
+every deployment, so the URL answers with a Vercel login instead of the page. The connector
+used for the deployment cannot change that account setting, so it has to be turned off in the
+dashboard (Settings, Deployment Protection, Disabled) before the site is reachable by anyone
+who is not logged into Vercel.
+
+## 19. The desktop build
 
 `npm run dist` runs `electron-vite build` and then `electron-builder`, which is configured in
 the `build` field of `package.json`: a DMG and a ZIP on macOS, NSIS and a portable exe on

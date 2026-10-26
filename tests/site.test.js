@@ -131,6 +131,18 @@ test('the page background is warm, not pure white', () => {
 
 /* --------------------------------------------------------------- markup */
 
+test('the Vercel configuration builds the site and rewrites the routes', () => {
+  const config = JSON.parse(readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+
+  assert.equal(config.buildCommand, 'npm run site:build');
+  assert.equal(config.outputDirectory, 'site/dist');
+  assert.equal(config.build.env.ELECTRON_SKIP_BINARY_DOWNLOAD, '1');
+  assert.ok(
+    config.rewrites.some((rewrite) => rewrite.destination === '/index.html'),
+    'the client side routes need a rewrite to the shell',
+  );
+});
+
 test('the renderer build addresses its assets relatively, so it can live under /web/', () => {
   const built = path.join(ROOT, 'out/web/index.html');
   if (!existsSync(built)) {

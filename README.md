@@ -127,6 +127,11 @@ npm run site:preview  # serve the built site
 `site/` is a small Vite + React + Tailwind 4 project. It has four pages: the overview, the
 download page, and drafts of the privacy policy and the terms of use.
 
+**Live**: <https://halo-sarang-dev.vercel.app>. It is built on Vercel straight from this
+repository: the project runs `npm run site:build`, serves `site/dist` and rewrites the four
+client side routes to `index.html`. `vercel.json` holds the build command, the output
+directory, that rewrite and the cache headers for the hashed assets.
+
 **The demo on the overview page is the real application.** The page embeds the shipping
 renderer in an iframe (`/web/index.html`, built by `npm run web:build`) rather than a
 screenshot of it, so what you see is the interface that ships. The answers in that frame are
@@ -280,7 +285,7 @@ npm run web        # the renderer alone in a browser (no keys, demo mode)
 npm run server     # the classic web app on :8787
 npm run site:dev   # the marketing site on :5174
 npm run build      # production build of all three processes
-npm run site:build # production build of the site
+npm run site:build # production build of the site, the same command Vercel runs
 npm run typecheck  # tsc --noEmit
 npm test           # 92 unit + integration tests
 ```
