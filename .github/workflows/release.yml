@@ -151,6 +151,8 @@ jobs:
           # normal commit, so they are kept in Git LFS.
           git lfs install
           git lfs track 'release/*.exe' 'release/*.AppImage' 'release/*.deb'
+          # The folder holds the files of the tag that was built, not of every tag.
+          rm -rf release
           mkdir -p release
           while IFS= read -r file; do
             cp "$file" "release/$(basename "$file")"
