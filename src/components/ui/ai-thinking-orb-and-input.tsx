@@ -33,7 +33,7 @@ import {
 } from 'react';
 import { ArrowUp, RotateCcw, Sparkles } from 'lucide-react';
 
-import '../../index.css';
+import '../../../shared/orb.css';
 
 /* ------------------------------------------------------------------ types */
 

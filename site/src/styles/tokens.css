@@ -1,0 +1,68 @@
+/**
+ * Halo, the design tokens.
+ *
+ * One accent, two typefaces, a warm near-white page.
+ *
+ * The accent is the green the orb condenses into when it has an answer, so
+ * the page and the product share a colour. Everything else is neutral: the
+ * paper carries the layout, the ink carries the reading, and the hairlines
+ * carry the structure.
+ */
+
+:root {
+  /* Colour */
+  --paper: #faf9f6;
+  --paper-2: #f2f0e9;
+  --paper-3: #ebe8df;
+  --card: #ffffff;
+  --ink: #16150f;
+  --ink-2: #45433b;
+  --ink-3: #6c685d;
+  --line: #e3e0d5;
+  --line-2: #cfcbba;
+  --accent: #1f5b45;
+  --accent-ink: #123a2b;
+  --accent-wash: #e8efea;
+  --stage: #0a0c12;
+
+  /* Type */
+  --font-display: 'Newsreader Variable', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-ui: 'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.0625rem;
+  --step-2: 1.3125rem;
+  --step-3: 1.75rem;
+  --step-4: clamp(2rem, 1.55rem + 2.1vw, 2.75rem);
+  --step-5: clamp(2.5rem, 1.6rem + 3.9vw, 4.25rem);
+
+  --leading-tight: 1.05;
+  --leading-heading: 1.14;
+  --leading-body: 1.6;
+  --leading-serif: 1.55;
+
+  --tracking-display: -0.021em;
+  --tracking-heading: -0.014em;
+
+  /* Space */
+  --gutter: 1.5rem;
+  --shell: 74rem;
+  --measure: 34rem;
+  --measure-wide: 44rem;
+  --section: clamp(4.5rem, 3rem + 6vw, 8rem);
+
+  /* Structure */
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --hairline: 1px solid var(--line);
+  --focus: 2px solid var(--accent);
+  --focus-offset: 3px;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --gutter: 2.5rem;
+  }
+}

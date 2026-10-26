@@ -1,7 +1,8 @@
 # Halo — Siri-style voice assistant on the Gemini Live API
 
-**Implementation plan** · repo `sarang-cmd/gemini-live` · status: **executed** · 75 tests green
+**Implementation plan** · repo `sarang-cmd/gemini-live` · status: **executed** · 92 tests green
 · phase 1: the web app (50 tests) · phase 2: the Electron desktop app (25 more tests)
+· phase 3: the marketing site (17 more tests) and the packaging script
 
 ---
 
@@ -292,5 +293,77 @@ npm run dev        # Electron with hot reload
 npm run web        # the renderer alone, in a browser, in demo mode
 npm run build      # production build of all three processes
 npm run typecheck  # tsc --noEmit
-npm test           # 75 tests
+npm test           # 92 tests
 ```
+
+---
+
+## 17. The marketing site
+
+### The direction
+
+A single warm off-white page (`#faf9f6`, never pure white), one dark ink, one green accent
+(`#1f5b45`), hairline rules instead of cards, and two typefaces: Newsreader for the display
+and Instrument Sans for everything else. Both are self-hosted through `@fontsource-variable`,
+so no request leaves the origin. The rules that shaped it:
+
+- **The product is the picture.** The hero embeds the shipping renderer in an iframe
+  (`/web/index.html`, built by `npm run web:build`) instead of a screenshot, so the page
+  shows the interface that ships. The answers in that frame are scripted, and the caption
+  says so.
+- **No invented evidence.** Every model name, voice count and price is taken from the code:
+  `gemini-3.8-live`, `whisper-large-v3-turbo`, `canopylabs/orpheus-v1-english`, the 30
+  voices in `shared/voices.js`, the 75 (now 92) tests. No testimonials, no logos, no
+  "trusted by" row, no numbers that were not measured.
+- **The legal pages are drafts.** The privacy page and the terms of use describe what the
+  software actually does. Where a legal entity, a jurisdiction or a contact address would be
+  needed, the page says `Draft` instead of inventing one.
+- **Radix for behaviour, Motion for one reveal.** A dialog for the mobile menu, tabs for the
+  two providers, an accordion for the questions, a `LazyMotion` wrapper for the hero. No
+  animation library in the app bundle.
+- **Copy rules.** No em dashes, no en dashes, no "not X, but Y", no emoji, no checkmark
+  bullets, no three card kits. The rules are enforced by `tests/site.test.js` rather than by
+  good intentions.
+
+### The structure
+
+```
+site/
+  index.html            the entry, the inline SVG favicon
+  vite.config.ts        the Vite config and the plugin that serves /web
+  src/main.tsx          the React entry, the fonts, the stylesheets
+  src/router.tsx        a four page router on the History API
+  src/content.ts        every line of copy on the site
+  src/styles/           tokens.css (the palette, the type scale) and site.css
+  src/components/       SiteHeader SiteFooter AppFrame CommandBlock ProviderTabs
+                        Faq Pipeline VoiceTable
+  src/pages/            Home Download Privacy Terms
+```
+
+### What was verified
+
+| Check | Result |
+|---|---|
+| The copy rules | `tests/site.test.js` fails the build on an em dash, an en dash, an emoji, a banned typeface or the "not X, but Y" shape |
+| The contrast | every ink and the accent are checked against every background, all at 4.5:1 or better. `--ink-3` was darkened from `#767268` to `#6c685d` because it was 4.21:1 on the secondary background |
+| The markup | all four pages are rendered with `react-dom/server` and checked for the real model names, the sections and the draft markers |
+| The behaviour | the menu opens and closes, the tabs swap, the accordion opens, the copy button writes the command to the clipboard and the router moves between the pages, all in jsdom |
+| The links | every internal link is checked against the four routes that exist |
+| The frame | the renderer build has to address its assets relatively, or it breaks under `/web/`; a test keeps it that way |
+| The page in a browser | **not possible in the sandbox** — no browser binary and no way to fetch one, so the layout was reviewed in the stylesheet and in the rendered markup, not on a screen. The desktop and the mobile widths were reasoned about, not looked at. |
+
+## 18. The desktop build
+
+`npm run dist` runs `electron-vite build` and then `electron-builder`, which is configured in
+the `build` field of `package.json`: a DMG and a ZIP on macOS, NSIS and a portable exe on
+Windows, an AppImage and a deb on Linux, with `build/icon.png` as the icon.
+`scripts/build-desktop.sh` wraps the same steps and explains what is missing when the
+Electron runtime is not on the machine.
+
+**What could not be done here:** the Electron runtime is downloaded from the GitHub
+releases, and those hosts are outside the sandbox's egress allowlist, so
+`electron-builder` stops with `Client network socket disconnected before secure TLS
+connection was established` while fetching `electron-v45`. The application build itself
+succeeds, the packaging configuration is complete, and the script fails with a readable
+message instead of a stack trace. Running `./scripts/build-desktop.sh` on a machine that can
+reach the releases produces the installers.
