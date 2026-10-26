@@ -142,14 +142,18 @@ The installers are built in the open and published with the repository.
 Linux runners, so the NSIS installer and the portable exe are produced with the tools of
 that operating system. Push a `v*` tag and the files land in the release for that tag.
 
-**The current build**: <https://github.com/sarang-cmd/gemini-live/releases/tag/v2.0.0>
+**The current build**: <https://github.com/sarang-cmd/gemini-live/releases/tag/v2.0.1>
 
 | File | What it is |
 | --- | --- |
-| `Halo.Setup.2.0.0.exe` | the Windows installer, 120 MB, installs Halo with a shortcut |
-| `Halo.2.0.0.exe` | the portable Windows app, 108 MB, runs without installing |
-| `Halo-2.0.0.AppImage` | the Linux app image, 128 MB |
-| `halo_2.0.0_amd64.deb` | the Debian package, 100 MB |
+| `Halo.Setup.2.0.1.exe` | the Windows installer, 120 MB, installs Halo with a shortcut |
+| `Halo.2.0.1.exe` | the portable Windows app, 108 MB, runs without installing |
+| `Halo-2.0.1.AppImage` | the Linux app image, 128 MB |
+| `halo_2.0.1_amd64.deb` | the Debian package, 100 MB |
+
+The build of 2.0.0 stopped before the window opened, because the main
+process declared a name twice in the same module. 2.0.1 is the build that
+starts.
 
 The installers are in the repository as well, in `release/`. They are larger than the
 100 MB that GitHub takes in a normal commit, so they are kept in Git LFS: a clone that

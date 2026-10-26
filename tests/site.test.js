@@ -66,10 +66,10 @@ test('the copy does not use the "not X, but Y" shape', () => {
 });
 
 test('the download page names the installers that were built', () => {
-  assert.match(contentSource, /Halo\.Setup\.2\.0\.0\.exe/);
-  assert.match(contentSource, /Halo-2\.0\.0\.AppImage/);
-  assert.match(contentSource, /halo_2\.0\.0_amd64\.deb/);
-  assert.match(contentSource, /releases\/tag\/v2\.0\.0/);
+  assert.match(contentSource, /Halo\.Setup\.2\.0\.1\.exe/);
+  assert.match(contentSource, /Halo-2\.0\.1\.AppImage/);
+  assert.match(contentSource, /halo_2\.0\.1_amd64\.deb/);
+  assert.match(contentSource, /releases\/tag\/v2\.0\.1/);
 });
 
 test('the site names both legal pages and marks the open questions', () => {
