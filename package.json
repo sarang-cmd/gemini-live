@@ -17,6 +17,7 @@
     "test": "node --test --test-force-exit",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "dist": "electron-vite build && electron-builder",
+    "electron:install": "node scripts/install-electron.mjs",
     "site:dev": "vite --config site/vite.config.ts",
     "site:build": "npm run web:build && vite build --config site/vite.config.ts",
     "site:preview": "vite preview --config site/vite.config.ts"

@@ -114,6 +114,40 @@ machine that cannot reach those releases, set `ELECTRON_MIRROR` to a mirror that
 reachable, or unpack a runtime into `node_modules/electron/dist` by hand. The application
 build itself (`npm run build`) needs neither.
 
+#### "Error: Electron uninstall"
+
+That message from `electron-vite` means the `electron` package is installed but its runtime
+was never downloaded, so there is nothing to start. The runtime comes from the GitHub
+releases, and that host is blocked on many networks.
+
+```bash
+npm run electron:install      # runs the download again, and explains a failure
+```
+
+If the download is what is blocked, point it at a mirror:
+
+```bash
+# macOS, Linux
+ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ npm run electron:install
+
+# Windows PowerShell
+$env:ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/"
+npm run electron:install
+```
+
+#### Prebuilt installers
+
+The installers are built in the open and published with the repository.
+[`.github/workflows/release.yml`](.github/workflows/release.yml) runs on real Windows and
+Linux runners, so the NSIS installer and the portable exe are produced with the tools of
+that operating system. Push a `v*` tag and the files land in the release for that tag:
+
+- Windows: `Halo Setup <version>.exe` (NSIS) and `Halo <version>.exe` (portable)
+- Linux: `halo_<version>_amd64.AppImage` and `halo_<version>_amd64.deb`
+
+The workflow can also be started by hand from the Actions tab, and the artifacts of that
+run are downloadable there.
+
 ---
 
 ## The site
