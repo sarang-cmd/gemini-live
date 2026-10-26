@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Halo \u2014 a Siri-style voice assistant for the desktop, powered by the Gemini Live API and Groq",
   "main": "out/main/index.js",
-  "author": "sarang-cmd",
+  "author": "Sarang <sarang-cmd@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
     "dev": "electron-vite dev",

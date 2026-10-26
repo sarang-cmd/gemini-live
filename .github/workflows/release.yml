@@ -5,6 +5,9 @@ name: release
 # The workflow runs on real Windows and Linux runners, so the installer is
 # produced with the tools of that operating system: the NSIS installer and
 # the portable exe on Windows, the AppImage and the deb on Linux.
+#
+# The installers are also committed to the repository, so the files are part
+# of the source tree and not only in the release.
 
 on:
   push:
@@ -52,8 +55,8 @@ jobs:
   linux:
     name: Linux
     runs-on: ubuntu-latest
-    # The AppImage is built without FUSE, and a failure here must not keep the
-    # Windows installers from being released.
+    # The AppImage is built without FUSE, which the runner does not have, and
+    # a failure here must not keep the Windows installers from being released.
     continue-on-error: true
     env:
       ELECTRON_BUILDER_APPIMAGE_EXTRACT_AND_RUN: '1'
@@ -98,8 +101,58 @@ jobs:
       - name: Publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
           TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
         run: |
-          gh release create "$TAG" artifacts/* \
-            --title "Halo $TAG" \
-            --notes "The desktop build of Halo: the NSIS installer and the portable exe for Windows, the AppImage and the deb for Linux."
+          set -euo pipefail
+          ls -la artifacts
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release upload "$TAG" artifacts/* --repo "$REPO" --clobber
+          else
+            gh release create "$TAG" --repo "$REPO" --verify-tag \
+              --title "Halo $TAG" \
+              --notes "The desktop build of Halo: the NSIS installer and the portable exe for Windows, the AppImage and the deb for Linux." \
+              artifacts/*
+          fi
+
+  repository:
+    name: Add the installers to the repository
+    needs: [windows, linux]
+    runs-on: ubuntu-latest
+    # The release above is the deliverable. A failure here must not undo it.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Commit the installers
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          for file in artifacts/*; do
+            size=$(stat -c%s "$file")
+            if [ "$size" -lt 100000000 ]; then
+              cp "$file" "release/$(basename "$file")"
+            else
+              echo "$(basename "$file") is $size bytes: too large for git, it stays in the release"
+            fi
+          done
+          ls -la release
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f release
+          if git diff --cached --quiet; then
+            echo 'The repository already holds these installers.'
+            exit 0
+          fi
+          git commit -m "Add the installers built for this tag"
+          git push origin HEAD:main
