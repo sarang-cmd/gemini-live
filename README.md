@@ -140,10 +140,20 @@ npm run electron:install
 The installers are built in the open and published with the repository.
 [`.github/workflows/release.yml`](.github/workflows/release.yml) runs on real Windows and
 Linux runners, so the NSIS installer and the portable exe are produced with the tools of
-that operating system. Push a `v*` tag and the files land in the release for that tag:
+that operating system. Push a `v*` tag and the files land in the release for that tag.
 
-- Windows: `Halo Setup <version>.exe` (NSIS) and `Halo <version>.exe` (portable)
-- Linux: `halo_<version>_amd64.AppImage` and `halo_<version>_amd64.deb`
+**The current build**: <https://github.com/sarang-cmd/gemini-live/releases/tag/v2.0.0>
+
+| File | What it is |
+| --- | --- |
+| `Halo.Setup.2.0.0.exe` | the Windows installer, 120 MB, installs Halo with a shortcut |
+| `Halo.2.0.0.exe` | the portable Windows app, 108 MB, runs without installing |
+| `Halo-2.0.0.AppImage` | the Linux app image, 128 MB |
+| `halo_2.0.0_amd64.deb` | the Debian package, 100 MB |
+
+The installers are in the repository as well, in `release/`. They are larger than the
+100 MB that GitHub takes in a normal commit, so they are kept in Git LFS: a clone that
+has Git LFS, which Git for Windows ships with, gives you the files themselves.
 
 The workflow can also be started by hand from the Actions tab, and the artifacts of that
 run are downloadable there.

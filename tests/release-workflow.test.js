@@ -50,8 +50,23 @@ test('the AppImage is built without FUSE, which the runner does not have', () =>
 
 test('the installers are committed to the repository as well', () => {
   const repository = workflow.slice(workflow.indexOf('  repository:'));
-  assert.match(repository, /git add -f release/);
+  assert.match(repository, /git lfs track/);
+  assert.match(repository, /git lfs push/);
+  assert.match(repository, /git add -f .gitattributes release/);
   assert.match(repository, /git push origin HEAD:main/);
+});
+
+test('the repository keeps the installers in Git LFS, they are too large for a commit', () => {
+  const attributes = readFileSync(path.join(ROOT, '.gitattributes'), 'utf8');
+  assert.match(attributes, /release\/\*\.exe filter=lfs/);
+  assert.match(attributes, /release\/\*\.AppImage filter=lfs/);
+  assert.match(attributes, /release\/\*\.deb filter=lfs/);
+});
+
+test('the readme points at the release that holds the installers', () => {
+  const readme = readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+  assert.match(readme, /releases\/tag\/v2\.0\.0/);
+  assert.match(readme, /Halo\.Setup\.2\.0\.0\.exe/);
 });
 
 test('the package has an author with an email address, which the deb needs', () => {

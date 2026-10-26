@@ -144,23 +144,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          # The installers are larger than the 100 MB that GitHub takes in a
+          # normal commit, so they are kept in Git LFS.
+          git lfs install
+          git lfs track 'release/*.exe' 'release/*.AppImage' 'release/*.deb'
           mkdir -p release
           while IFS= read -r file; do
-            size=$(stat -c%s "$file")
-            if [ "$size" -lt 100000000 ]; then
-              cp "$file" "release/$(basename "$file")"
-            else
-              echo "$(basename "$file") is $size bytes: too large for git, it stays in the release"
-            fi
+            cp "$file" "release/$(basename "$file")"
           done < <(find artifacts -type f | sort)
           ls -la release
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f release
+          git add -f .gitattributes release
           if git diff --cached --quiet; then
             echo 'The repository already holds these installers.'
             exit 0
           fi
           git commit -m "Add the installers built for this tag"
-          git pull --rebase origin main
+          git lfs push --include='release/*' origin HEAD:main
           git push origin HEAD:main

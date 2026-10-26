@@ -383,6 +383,19 @@ Two answers to that:
   Linux runners, which have the network access the sandbox does not, and publishes them in
   the GitHub release for the pushed tag.
 
+The first release is `v2.0.0`: `Halo.Setup.2.0.0.exe` (120 MB), `Halo.2.0.0.exe` (108 MB),
+`Halo-2.0.0.AppImage` (128 MB) and `halo_2.0.0_amd64.deb` (100 MB). The same files are
+committed to `release/` in the repository. They are past the 100 MB that GitHub takes in a
+normal commit, so they are kept in Git LFS, which `.gitattributes` declares.
+
+What the first run of the workflow showed, and what is now in it:
+
+- The deb package needs an author with an email address, so `package.json` has one.
+- The AppImage is built on a runner without FUSE, so the builder extracts and runs it.
+- The publish step names the repository, because that job has no checkout to take it from.
+- The artifacts keep the `release/` directory they were taken from, so the files are found
+  by name and not with a glob over the top of the download directory.
+
 ## 20. The desktop build
 
 `npm run dist` runs `electron-vite build` and then `electron-builder`, which is configured in
